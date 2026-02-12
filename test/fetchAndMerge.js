@@ -28,7 +28,7 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
             });
         };
 
-        const result = await fetchAndMergeData(urls);
+        const result = await fetchAndMerge(urls);
         assert.deepEqual(result, expected, "Должно правильно объединять данные с разных URL");
     });
 
@@ -40,8 +40,47 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
 
         window.fetch = () => Promise.reject(new Error("Network error"));
 
-        const result = await fetchAndMergeData(urls);
+        const result = await fetchAndMerge(urls);
         assert.deepEqual(result, {}, "Должно возвращать пустой объект при ошибке fetch");
     });
-});
 
+    QUnit.test("Корректно работает с пустым списком URL", async function(assert) {
+        const urls = [];
+        const expected = {};
+
+        window.fetch = () => Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({})
+        });
+
+        const result = await fetchAndMerge(urls);
+
+        assert.deepEqual(result, expected,
+            "Пустой массив URL должен возвращать пустой объект");
+    });
+
+
+    QUnit.test("Объединяет одинаковые поля и оставляет только уникальные значения", async function(assert) {
+        const urls = ['/user1', '/user2', '/user3'];
+
+        const responses = {
+            '/user1': { age: 20, city: 'Moscow' },
+            '/user2': { age: 20, city: 'London', hobby: 'music' },
+            '/user3': { age: 25, hobby: 'music' }
+        };
+
+        window.fetch = url => Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(responses[url])
+        });
+
+        const expected = {
+            age: [20, 25],
+            city: ["Moscow", "London"],
+            hobby: ["music"]
+        };
+
+        const result = await fetchAndMerge(urls);
+        assert.deepEqual(result, expected, "Повторяющиеся поля собираются в массив, одиночные остаются значением");
+    });
+});
