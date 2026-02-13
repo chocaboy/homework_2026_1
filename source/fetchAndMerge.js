@@ -10,7 +10,6 @@
  * @example
  * fetchAndMerge(['./data1.json', './data2.json']);
  */
-
 const fetchAndMerge = urls => {
     if (!Array.isArray(urls) || urls.length === 0) {
         return Promise.resolve({});
