@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * Функция загружает JSON-данные с нескольких URL и объединяет полученные объекты.
  *
@@ -25,26 +24,28 @@ const fetchAndMerge = urls => {
     );
 
     return Promise.all(requests).then(objects => {
-        const valuesMap = new Map();
+        const result = {};
 
         objects.forEach(obj => {
             if (!obj || typeof obj !== 'object') return;
 
             Object.keys(obj).forEach(key => {
                 const value = obj[key];
-                const currentValues = valuesMap.get(key) || [];
 
-                if (!currentValues.some(v => v === value)) {
-                    currentValues.push(value);
+                if (!result[key]) {
+                    result[key] = [];
                 }
 
-                valuesMap.set(key, currentValues);
+                if (!result[key].includes(value)) {
+                    result[key].push(value);
+                }
             });
         });
 
-        const result = {};
-        valuesMap.forEach((values, key) => {
-            result[key] = values;
+        Object.entries(result).forEach(([key, value]) => {
+            if (value.length === 1) {
+                result[key] = value[0];
+            }
         });
 
         return result;

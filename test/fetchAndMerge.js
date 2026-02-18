@@ -13,7 +13,7 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
             "id": [1, 2],
             "name": ["Олег", "Мария"],
             "surname": ["Петров", "Иванова"],
-            "status": ["Дуров, верни стену!"],
+            "status": "Дуров, верни стену!",
         };
         
         window.fetch = (url) => {
@@ -77,7 +77,7 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
         const expected = {
             age: [20, 25],
             city: ["Moscow", "London"],
-            hobby: ["music"]
+            hobby: "music",
         };
 
         const result = await fetchAndMerge(urls);
